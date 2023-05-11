@@ -1,0 +1,23 @@
+<style>
+    .schedule-day {
+        display: inline-block;
+        padding: 5px;
+        margin: 5px;
+        text-align: center;
+    }
+
+    .active {
+        border: solid green 2px;
+        border-radius: 0.5em;
+    }
+</style>
+
+<div class="schedule">
+    <div class="schedule-day {% if days.0 %}active{% endif %}">ПН<br><span class="text-muted">{{ times.0 }}</span></div>
+    <div class="schedule-day {% if days.1 %}active{% endif %}">ВТ<br><span class="text-muted">{{ times.1 }}</span></div>
+    <div class="schedule-day {% if days.2 %}active{% endif %}">СР<br><span class="text-muted">{{ times.2 }}</span></div>
+    <div class="schedule-day {% if days.3 %}active{% endif %}">ЧТ<br><span class="text-muted">{{ times.3 }}</span></div>
+    <div class="schedule-day {% if days.4 %}active{% endif %}">ПТ<br><span class="text-muted">{{ times.4 }}</span></div>
+    <div class="schedule-day {% if days.5 %}active{% endif %}">СБ<br><span class="text-muted">{{ times.5 }}</span></div>
+    <div class="schedule-day {% if days.6 %}active{% endif %}">ВС<br><span class="text-muted">{{ times.6 }}</span></div>
+</div>

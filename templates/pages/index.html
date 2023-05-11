@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+{% load static %}
+
+
+{% block title %}
+    Твой.TLearn | Вход
+{% endblock %}
+
+{% block content %}
+    <div style="height: 100vh;">
+        <div class="h-100 d-sm-flex align-items-center justify-content-around">
+            <div>
+                {% if request.user.is_authenticated %}
+                    <h2>Здравствуйте,</h2>
+                    <p>{{ request.user.fn }}.</p>
+                    <p>Вы уже авторизованы:</p>
+                    <a href="{% url 'personal' %}"><button class="btn btn-primary">В личный кабинет</button></a>
+                    <a href="{% url 'logout' %}"><button class="btn btn-danger">Выйти</button></a>
+                {% else %}
+                    <h1>Вход в личный кабинет</h1>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <input type="submit" class="btn btn-primary" value="Войти">
+                    </form>
+
+
+                {% endif %}
+            </div>
+            <div>
+                <img src="{% static 'imgs/LogoTLearnAcademy.png' %}" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

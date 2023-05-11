@@ -1,0 +1,54 @@
+{% extends 'personal.html' %}
+{% load core_tags %}
+{% block title %}
+    Личный кабинет - Пользователи
+{% endblock %}
+
+{% block section %}
+    <div class="white-section d-sm-flex justify-content-between align-items-center">
+        <div>
+            <h2>Группы</h2>
+            <p>Все группы</p>
+        </div>
+        <div>
+            <a href="{% url 'groupCreate' %}"><button class="btn btn-success">+ Создать</button></a>
+        </div>
+    </div>
+
+    <div class="white-section">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Название группы</th>
+                    <th scope="col">Факультет</th>
+                    <th scope="col">Преподаватель</th>
+                    <th scope="col">Дни</th>
+                    <th scope="col">Тип</th>
+                    <th scope="col">Студентов</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in groups_list %}
+                    <tr>
+                        <th scope="row"><a href="{{ group.get_absolute_url }}">{{ group.groupName }}</a></th>
+                        <td>{{ group.groupDep }}</td>
+                        <td>{{ group.groupTeacher.fn }}</td>
+                        <td>
+{#                            {% for d in group.groupDays.all %}#}
+{#                                {{ d }};#}
+{#                            {% endfor %}#}
+                            {% schedule_mini group %}
+                        </td>
+                        <td>{{ group.groupType }}</td>
+                        {% if group.groupType == group.TYPE.1.1 %}
+                            <td>{{ group.groupStudents.first }}</td>
+                        {% else %}
+                            <td>{{ group.groupStudents.count }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

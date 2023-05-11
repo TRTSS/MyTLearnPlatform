@@ -1,0 +1,14 @@
+<style>
+    .common {
+        background: #e7e7e7;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 15px;
+    }
+</style>
+
+<div class="{% if type == post.TYPE.0.0 %}common{% endif %}">
+    <h4>{{ post.postTitle }}</h4>
+    <p class="text-muted">{{ post.postCreationDate }}</p>
+    <p>{{ post.postBody }}</p>
+</div>

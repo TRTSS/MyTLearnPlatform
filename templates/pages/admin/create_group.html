@@ -1,0 +1,19 @@
+{% extends 'personal.html' %}
+{% load static %}
+{% load crispy_forms_filters %}
+
+{% block section %}
+    <div class="white-section">
+        <h1>Создание новой группы</h1>
+    </div>
+
+    <div class="white-section">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <input type="submit" value="Создать" class="btn btn-primary">
+        </form>
+    </div>
+
+
+{% endblock %}

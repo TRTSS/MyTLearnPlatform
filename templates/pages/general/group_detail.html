@@ -1,0 +1,119 @@
+{% extends 'personal.html' %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% load core_tags %}
+
+{% block title %}
+    Группа {{ group.groupName }}
+{% endblock %}
+
+{% block section %}
+    <style>
+        .info-menu-item {
+            margin: 10px;
+            font-weight: bold;
+            color: #848582;
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .info-menu-item:hover {
+            color: #474846;
+        }
+
+        .group-info-section {
+            display: none;
+        }
+
+        .group-info-section.show {
+            display: block;
+        }
+    </style>
+    <div class="white-section">
+        <h2>{{ group.groupName }}</h2>
+    </div>
+    <div class="d-sm-flex justify-content-around" style="padding: 0px !important;">
+        <div class="d-sm-flex flex-column p-0 m-0">
+            <div class="white-section">
+                <h3>Расписание</h3>
+                <p>{% schedule group %}</p>
+            </div>
+            <div class="white-section">
+                <h3>Студенты</h3>
+                {% if request.user.is_admin %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        Добавить
+                    </button>
+                {% endif %}
+                {% for s in group.groupStudents.all %}
+                    <p>{{ s }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="d-sm-flex flex-column p-0 m-0 w-100">
+            <div class="white-section">
+                <div class="d-sm-flex align-items-center mb-4">
+                    <div class="info-menu-item" activate-section="group-posts">Уведомления</div>
+                    <div class="info-menu-item" activate-section="group-home-tasks">Домашние задания</div>
+                </div>
+                <div class="group-info-section show" id="group-posts">
+                    <h4>Уведомления</h4>
+                    {% if request.user.is_admin or request.user.is_tutor %}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#createPostModal">
+                            + Добавить
+                        </button>
+                    {% endif %}
+                    {% for post in group.groupPosts.all %}
+                        {% postdecor post %}
+                    {% endfor %}
+                </div>
+                <div class="group-info-section" id="group-home-tasks">
+                    <h4>Домашние задания</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if request.user.is_admin %}
+        <div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+             aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Добавление ученика в группу</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ addUserForm|crispy }}
+                            <button type="submit" class="btn btn-primary">Добавить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="createPostModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+             aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Новое уведомление</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ createPostForm|crispy }}
+                            <button type="submit" class="btn btn-primary">Создать</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <script src="{% static 'js/GroupInfoSectionsController.js' %}"></script>
+{% endblock %}

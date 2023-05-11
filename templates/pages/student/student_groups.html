@@ -1,0 +1,51 @@
+{% extends 'personal.html' %}
+{% load core_tags %}
+{% block title %}
+    Личный кабинет - Группы
+{% endblock %}
+
+
+
+{% block section %}
+    <style>
+        .student-group {
+            background: #0c63e4;
+            padding: 20px;
+            border-radius: 30px;
+            color: white;
+            margin: 20px;
+        }
+
+        .dep-label {
+            font-size: 14px;
+            padding: 5px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+        }
+    </style>
+
+    <div class="white-section d-sm-flex justify-content-between align-items-center">
+        <div>
+            <h2>Группы</h2>
+            <p>Ваши группы</p>
+        </div>
+    </div>
+
+    <div class="white-section" style="border: none;">
+        {% for group in groups %}
+            <div class="student-group d-sm-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ group.groupName }} <span class="dep-label">{{ group.groupDep }}</span></h3>
+                    <p><b>Преподаватель:</b> {{ group.groupTeacher }}</p>
+                    {% schedule_mini group %}
+                </div>
+                <div>
+                </div>
+                <div>
+                    <a href="{{ group.get_absolute_url }}"><button class="btn btn-light">Страница группы</button></a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

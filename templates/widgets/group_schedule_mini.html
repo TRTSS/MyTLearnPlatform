@@ -1,0 +1,30 @@
+<style>
+    .schedule-day {
+        display: inline-block;
+        padding: 5px;
+        margin: 1px;
+        text-align: center;
+        font-size: 14px;
+        line-height: 10px;
+    }
+
+    .schedule {
+        white-space: nowrap;
+    }
+
+    .active {
+        background: green;
+        color: white;
+        border-radius: 50px;
+    }
+</style>
+
+<div class="schedule">
+    <div class="schedule-day {% if days.0 %}active{% endif %}">ПН</div>
+    <div class="schedule-day {% if days.1 %}active{% endif %}">ВТ</div>
+    <div class="schedule-day {% if days.2 %}active{% endif %}">СР</div>
+    <div class="schedule-day {% if days.3 %}active{% endif %}">ЧТ</div>
+    <div class="schedule-day {% if days.4 %}active{% endif %}">ПТ</div>
+    <div class="schedule-day {% if days.5 %}active{% endif %}">СБ</div>
+    <div class="schedule-day {% if days.6 %}active{% endif %}">ВС</div>
+</div>

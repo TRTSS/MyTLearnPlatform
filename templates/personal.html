@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Личный кабинет
+{% endblock %}
+
+
+
+{% block content %}
+    {% if request.user.is_admin %}
+        {% include 'pages/admin/menu_admin.html' %}
+    {% endif %}
+    {% if request.user.is_student %}
+        {% include 'pages/student/menu_student.html' %}
+    {% endif %}
+
+    {% block section %}
+    {% endblock %}
+{% endblock %}
+
