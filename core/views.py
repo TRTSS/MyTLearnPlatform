@@ -5,8 +5,8 @@ from django.views.generic import View, DetailView, CreateView
 import core.tools.notifyme as notify
 
 from accounts.models import User
-from .models import WorkGroup
-from .forms import NewGroupForm, AddStudentToGroupForm, AddGroupPost
+from .models import WorkGroup, GroupHomeTask, GroupTaskSolution, Mark
+from .forms import NewGroupForm, AddStudentToGroupForm, AddGroupPost, CreateTaskForGroup, SendTaskSolution, SetMarkToStudent
 from django.contrib.auth import views, forms, authenticate, login, logout
 from accounts.forms import NewUserForm
 
@@ -25,7 +25,8 @@ def admin_only(func):
 
 def inner_only(func):
     def check(request, pk):
-        if request.user.is_admin() or request.user in WorkGroup.objects.get(pk=pk).groupStudents.all():
+        group = WorkGroup.objects.get(pk=pk)
+        if request.user.is_admin() or request.user in group.groupStudents.all() or group.groupTeacher == request.user:
             return func(request, pk)
         else:
             return redirect('noPermForGroup')
@@ -136,12 +137,45 @@ def group_detail(request, pk):
             WorkGroup.objects.get(pk=pk).add_student(addStudentForm.cleaned_data['student'])
             context = notify.AddNotifyToQueue(context, 'Студент добавлен',
                                               f"{addStudentForm.cleaned_data['student']} успешно добавлен в группу {WorkGroup.objects.get(pk=pk)}")
+
+    if request.user.is_tutor() or request.user.is_admin():
+        print(request.FILES)
+        createTaskForm = CreateTaskForGroup(request.POST or None, request.FILES)
+        context['createTaskForm'] = createTaskForm
+        if createTaskForm.is_valid():
+            t = createTaskForm.save()
+            t.add_to_group(group)
         createPostForm = AddGroupPost(request.POST or None)
         context['createPostForm'] = createPostForm
         if createPostForm.is_valid():
             post = createPostForm.SavePost()
             group.groupPosts.add(post)
 
+    if request.user.is_student():
+        sendTaskSolutionForm = SendTaskSolution(request.POST or None, request.FILES)
+        context['sendTaskSolutionForm'] = sendTaskSolutionForm
+        print('PROCESSING')
+        if sendTaskSolutionForm.is_valid():
+            s = sendTaskSolutionForm.save()
+            s.add_to_task()
+            print('ACCEPTED')
+            messageEmail = f'<p>Студент {request.user} из группы {group.groupName} отправил решение домашнего задания "{s.solutionForTask}".</p>'
+            send_mail(
+                subject=f'{request.user} прислал решение',
+                message=messageEmail,
+                html_message=messageEmail,
+                from_email='support@tlearn.ru',
+                recipient_list=[group.groupTeacher.email],
+                fail_silently=False
+            )
+        else:
+            print(sendTaskSolutionForm.errors)
+
+        context['solutions'] = GroupTaskSolution.objects.filter(solutionFrom=request.user)
+
+    if request.user.is_tutor():
+        addMarkForm = SetMarkToStudent(request.POST or None)
+        context['solutions'] = GroupTaskSolution.objects.filter(solutionForTask__in=group.groupHometasks.all())
 
     return render(request, 'pages/general/group_detail.html', context)
 
@@ -153,5 +187,22 @@ def student_groups(request):
     return render(request, 'pages/student/student_groups.html', context)
 
 
+@login_required(login_url='')
+def tutor_groups(request):
+    context = {}
+    context['groups'] = WorkGroup.objects.filter(groupTeacher=request.user)
+    return render(request, 'pages/tutor/tutor_groups.html', context)
+
+
 def group_no_perm(request):
     return render(request, 'pages/general/no_perm_to_group.html', {})
+
+
+def students_marks(request):
+    context = {}
+    context['groups'] = request.user.work_groups.all()
+    context['marks'] = {}
+    for group in list(context['groups']):
+        context['marks'][group.groupName] = Mark.objects.filter(markForUser=request.user, markGroup=group)
+
+    return render(request, 'pages/student/students_marks.html', context)

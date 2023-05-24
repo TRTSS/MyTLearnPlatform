@@ -1,14 +1,36 @@
+
 <style>
     .common {
-        background: #e7e7e7;
+        background: #f1f1f1;
         border-radius: 20px;
         padding: 20px;
         margin: 15px;
     }
+
+    .warning {
+        background: #ffc05b;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 15px;
+    }
+
+    hr {
+        margin: 1rem 0;
+        color: inherit;
+        background-color: currentColor;
+        border: 0;
+        opacity: 0.25;
+    }
 </style>
 
-<div class="{% if type == post.TYPE.0.0 %}common{% endif %}">
-    <h4>{{ post.postTitle }}</h4>
+<div class="{% if type == post.TYPE.0.0 %}common{% endif %}{% if type == post.TYPE.1.0 %}warning{% endif %}">
+    <h4>
+        {% if type == post.TYPE.1.0 %}
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        {% endif %}
+        {{ post.postTitle }}
+    </h4>
+    <hr class="bg-dark border-2 border-top border-dark">
     <p class="text-muted">{{ post.postCreationDate }}</p>
     <p>{{ post.postBody }}</p>
 </div>

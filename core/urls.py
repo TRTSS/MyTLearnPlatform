@@ -11,5 +11,7 @@ urlpatterns = [
     path('my/groups/create', create_group, name='groupCreate'),
     path('my/group/<int:pk>', group_detail, name='groupDetail'),
     path('my/group/blocked', group_no_perm, name='noPermForGroup'),
-    path('my/studentgroups', student_groups, name='studentGroups')
+    path('my/studentgroups', student_groups, name='studentGroups'),
+    path('my/tutorgroups', tutor_groups, name='tutorGroups'),
+    path('my/studentmarks', students_marks, name='studentMarks')
 ]

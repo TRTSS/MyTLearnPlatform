@@ -71,6 +71,15 @@
                 </div>
                 <div class="group-info-section" id="group-home-tasks">
                     <h4>Домашние задания</h4>
+                    {% if request.user.is_tutor or request.user.is_admin %}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#createTaskModal">
+                            + Добавить
+                        </button>
+                    {% endif %}
+                    {% for task in group.groupHometasks.all %}
+                        {% taskdecor task %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -89,6 +98,27 @@
                         <form method="POST">
                             {% csrf_token %}
                             {{ addUserForm|crispy }}
+                            <button type="submit" class="btn btn-primary">Добавить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if request.user.is_tutor or request.user.is_admin %}
+        <div class="modal fade" id="createTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+             aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Новое домашнее задание</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ createTaskForm|crispy }}
                             <button type="submit" class="btn btn-primary">Добавить</button>
                         </form>
                     </div>
@@ -115,5 +145,34 @@
         </div>
     {% endif %}
 
+    {% if request.user.is_student %}
+        <div class="modal fade" id="sendSolutionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+             aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="sendSolutionTitle">Отправка решения</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ sendTaskSolutionForm|crispy }}
+                            <button type="submit" class="btn btn-primary">Отправить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <script src="{% static 'js/GroupInfoSectionsController.js' %}"></script>
+    <script>
+        function ShowSendSolutionModal(src) {
+            const sendTaskSolutionModal = new bootstrap.Modal('#sendSolutionModal', {});
+            document.querySelector('#id_solutionFrom').value = {{ request.user.pk }};
+            document.querySelector('#id_solutionForTask').value = src.getAttribute('tid');
+            sendTaskSolutionModal.show();
+        }
+    </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from .models import WorkGroup, WorkGroupPost
+from .models import WorkGroup, WorkGroupPost, GroupHomeTask, GroupTaskSolution, Mark
 from accounts.models import User
 
 
@@ -23,3 +23,34 @@ class AddGroupPost(forms.Form):
         post = WorkGroupPost(postTag=data['type'], postTitle=data['title'], postBody=data['body'])
         post.save()
         return post
+
+
+class CreateTaskForGroup(forms.ModelForm):
+    class Meta:
+        model = GroupHomeTask
+        fields = ['taskTitle', 'taskDescription', 'taskDeadline', 'taskFile']
+        widgets = {
+            'taskDeadline': forms.DateTimeInput()
+        }
+
+
+class SendTaskSolution(forms.ModelForm):
+    class Meta:
+        model = GroupTaskSolution
+        fields = ['solutionFrom', 'solutionFile', 'solutionForTask']
+        widgets = {
+            'solutionFrom': forms.HiddenInput(),
+            'solutionForTask': forms.HiddenInput()
+        }
+
+
+class DeleteTaskForm(forms.ModelForm):
+    class Meta:
+        model = GroupHomeTask
+        fields = ['id']
+
+
+class SetMarkToStudent(forms.ModelForm):
+    class Meta:
+        model = Mark
+        fields = ['markForUser', 'markGroup', 'markConnectedTask', 'markValue', 'markTarget', 'markComment']

@@ -14,6 +14,9 @@
     {% if request.user.is_student %}
         {% include 'pages/student/menu_student.html' %}
     {% endif %}
+    {% if request.user.is_tutor %}
+        {% include 'pages/tutor/menu_tutor.html' %}
+    {% endif %}
 
     {% block section %}
     {% endblock %}

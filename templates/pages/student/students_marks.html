@@ -1,0 +1,43 @@
+{% extends 'personal.html' %}
+{% load core_tags %}
+{% block title %}
+    Личный кабинет - Успеваемость
+{% endblock %}
+
+
+
+{% block section %}
+    <style>
+        .student-group {
+            background: #0c63e4;
+            padding: 20px;
+            border-radius: 30px;
+            color: white;
+            margin: 20px;
+        }
+
+        .dep-label {
+            font-size: 14px;
+            padding: 5px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+        }
+    </style>
+
+    <div class="white-section d-sm-flex justify-content-between align-items-center">
+        <div>
+            <h2>Успеваемость</h2>
+            <p>Ваша успеваемость и оценки</p>
+        </div>
+    </div>
+
+    <div class="white-section">
+        <table>
+                {% for g in groups %}
+                    {% groupmarks g %}
+                {% endfor %}
+        </table>
+
+    </div>
+{% endblock %}

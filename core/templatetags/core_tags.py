@@ -1,5 +1,7 @@
 from django import template
-from core.models import WorkGroup, WorkGroupPost
+from core.models import WorkGroup, WorkGroupPost, GroupHomeTask, Mark
+from core.forms import SetMarkToStudent
+from typing import List
 
 register = template.Library()
 
@@ -50,3 +52,38 @@ def postdecor(post: WorkGroupPost):
         'post': post,
         'type': post.postTag
     }
+
+
+@register.inclusion_tag('widgets/group_task.html', name='taskdecor', takes_context=True)
+def taskdecor(context, task: GroupHomeTask):
+    data = {
+        'task': task,
+        'request': context['request']
+    }
+    if context['request'].user.is_student():
+        data['sendTaskSolutionForm'] = context['sendTaskSolutionForm']
+        data['solutions'] = context['solutions'].filter(solutionForTask=task)
+    if context['request'].user.is_tutor():
+        data['solutions'] = context['solutions'].filter(solutionForTask=task)
+        addMarkForTask = SetMarkToStudent(initial={
+            'markConnectedTask': task,
+            'markGroup': context['group']
+        })
+        addMarkForTask.fields['markConnectedTask'].widget.attrs['readonly'] = True
+        data['addMarkForm'] = addMarkForTask
+    return data
+
+
+class Marks:
+    pass
+
+
+@register.inclusion_tag('widgets/group_marks_student.html', name='groupmarks', takes_context=True)
+def groupmarks(context, group: WorkGroup):
+    marks = Mark.objects.filter(markForUser=context['request'].user, markGroup=group)
+    data = {
+        'marks': marks,
+        'group': group,
+        'request': context['request']
+    }
+    return data

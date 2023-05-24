@@ -1,0 +1,105 @@
+{% load crispy_forms_filters %}
+<style>
+    .task-holder {
+        padding: 20px;
+        background: #0c63e4;
+        color: white;
+        border-radius: 20px;
+        margin: 15px;
+    }
+
+    hr {
+        margin: 1rem 0;
+        color: inherit;
+        background-color: currentColor;
+        border: 0;
+        opacity: 0.25;
+    }
+
+    .task-footer {
+        text-align: right;
+    }
+
+    .solutions-list {
+        padding: 15px;
+        border-radius: 15px;
+        background: white;
+        color: black;
+    }
+</style>
+
+<div class="task-holder">
+    <div>
+        <h4>{{ task.taskTitle }}</h4>
+        <hr class="bg-dark border-2 border-top border-dark">
+        <p>{{ task.taskDescription }}</p>
+        <div class="task-footer d-sm-flex justify-content-between">
+            <div>
+                {% if task.taskFile %}
+                    <a href="{{ task.taskFile.url }}">
+                        <button class="btn btn-light"><i class="bi bi-eye-fill"></i> Смотреть файл</button>
+                    </a>
+                    <a href="{{ task.taskFile.url }}" download>
+                        <button class="btn btn-light"><i class="bi bi-file-earmark-arrow-down-fill"></i></button>
+                    </a>
+                {% endif %}
+            </div>
+            <div>
+                {% if request.user.is_student %}
+                    {% if solutions.count == 0 %}
+                        <button class="btn btn-light" tid="{{ task.pk }}" onclick="ShowSendSolutionModal(this);">
+                            Отправить
+                            работу
+                        </button>
+                        <p>Срок сдачи до {{ task.taskDeadline }}</p>
+                    {% else %}
+                        <p><b>Вы уже отправили решение</b></p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% if request.user.is_tutor %}
+            <div>
+                <button class="btn btn-light mt-1" id='act-btn-{{ task.pk }}' show-area=""><b>Решения студентов
+                    ({{ solutions.count }})</b>
+                </button>
+                <div id="task-{{ task.pk }}-solutions" style="display: none;" class="solutions-list mt-1">
+                    {% if solutions.count == 0 %}
+                        <p>Решений пока нет</p>
+                    {% else %}
+                        {% for solution in solutions %}
+                            <div class="d-sm-flex justify-content-between align-items-center m-1">
+                                <div>
+                                    <div>{{ forloop.counter }}. {{ solution.solutionFrom }}</div>
+                                </div>
+                                <div>
+                                    <a href="{{ solution.solutionFile.url }}">
+                                        <button class="btn btn-dark"><i class="bi bi-eye-fill"></i> Открыть решение
+                                        </button>
+                                    </a>
+                                    <button class="btn btn-dark"><i class="bi bi-eye-fill"></i> Выставить оценку
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <form method="POST">
+                {{ addMarkForm|crispy }}
+                <button type="submit" class="btn btn-primary">Оценить</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.querySelector('#act-btn-{{ task.pk }}').onclick = function () {
+        let sols = document.querySelector('#task-{{ task.pk }}-solutions');
+        if (sols.style.display == 'none') {
+            sols.style.display = 'block';
+        } else {
+            sols.style.display = 'none';
+        }
+    }
+</script>
